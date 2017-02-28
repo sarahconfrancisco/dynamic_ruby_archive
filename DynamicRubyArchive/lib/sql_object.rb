@@ -1,12 +1,9 @@
 require_relative 'db_connection'
 require 'active_support/inflector'
 require 'byebug'
-# NB: the attr_accessor we wrote in phase 0 is NOT used in the rest
-# of this project. It was only a warm up.
 
 class SQLObject
   def self.columns
-    # ...
     if @columns
       @columns
     else
@@ -32,56 +29,46 @@ class SQLObject
   end
 
   def self.table_name=(table_name)
-    # ...
     @table_name = table_name
   end
 
   def self.table_name
-    # ...
     @table_name ||= self.to_s.tableize
 
   end
 
   def self.all
-    # ...
-    x = DBConnection.execute(<<-SQL)
+    search_results = DBConnection.execute(<<-SQL)
       SELECT
         *
       FROM
       #{table_name}
     SQL
-    self.parse_all(x)
+    self.parse_all(search_results)
   end
 
   def self.parse_all(results)
-    # ...
-    objects = []
-    results.each do |hash|
-      objects << self.new(hash)
-    end
-    objects
+    results.map { |hash| self.new(hash) }
   end
 
   def self.find(id)
-    # ...
-    x = DBConnection.execute(<<-SQL, id)
+    search_results = DBConnection.execute(<<-SQL, id)
       SELECT
-        *
+        #{table_name}.*
       FROM
       #{table_name}
       where
-      id = ?
+      #{table_name}id = ?
     SQL
-    if x.empty?
+    if search_results.empty?
       nil
     else
-      self.new(x.first)
+      parse_all(search_restults).first
     end
   end
 
   def initialize(params = {})
-    # ...
-    # debugger
+
     params.each do |attr_name, value|
       if self.class.columns.include?(attr_name.to_sym)
         send(attr_name.to_s + "=", value)
@@ -92,13 +79,11 @@ class SQLObject
   end
 
   def attributes
-    # ...
     @attributes ||= {}
 
   end
 
   def attribute_values
-    # ...
     values = []
     attributes.each do |k, v|
       values << v
@@ -107,10 +92,7 @@ class SQLObject
   end
 
   def insert
-    # ...
     vals = attribute_values
-    # debugger
-
     col_names = self.class.columns
     n = col_names.size - 1
     qmarks = (["?"] * n).join(", ")
@@ -125,10 +107,8 @@ class SQLObject
   end
 
   def update
-    # ...
     vals = attribute_values
     col_names_and_qmarks = self.class.columns[1..-1].join(" = ?, ") + " = ?"
-    # debugger
     DBConnection.execute(<<-SQL, *vals[1..-1])
       UPDATE
         #{self.class.table_name}
@@ -141,7 +121,6 @@ class SQLObject
   end
 
   def save
-    # ...
     if self.id.nil?
       self.insert
     else
