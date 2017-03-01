@@ -7,7 +7,7 @@ class AssocOptions
   )
 
   def model_class
-    self.class_name.constantize
+    @class_name.constantize
   end
 
   def table_name

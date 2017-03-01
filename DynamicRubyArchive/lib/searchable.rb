@@ -3,14 +3,8 @@ require_relative 'sql_object'
 require 'byebug'
 module Searchable
   def where(params)
-    where_line = []
-    vals = []
-    params.each do |k, v|
-      where_line << k.to_s + " = ?"
-      vals << v
-    end
-    where_line = where_line.join(" AND ")
-    x = DBConnection.execute(<<-SQL, *vals)
+    where_line, vals = where_line_and_values(params)
+    search_results = DBConnection.execute(<<-SQL, *vals)
       SELECT
         *
       FROM
@@ -18,12 +12,19 @@ module Searchable
       WHERE
         #{where_line}
     SQL
-    ret_array = []
-    if x.empty?
-      []
-    else
-      parse_all(x)
+    return [] if search_results.empty?
+    parse_all(search_results)
+  end
+
+  def where_line_and_values(params)
+    where_line = []
+    vals = []
+    params.each do |k, v|
+      where_line << k.to_s + " = ?"
+      vals << v
     end
+    where_line = where_line.join(" AND ")
+    [where_line, vals]
   end
 end
 

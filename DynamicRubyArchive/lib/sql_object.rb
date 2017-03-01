@@ -60,11 +60,8 @@ class SQLObject
       where
       #{table_name}id = ?
     SQL
-    if search_results.empty?
-      nil
-    else
-      parse_all(search_restults).first
-    end
+    return nil if search_results.empty?
+    parse_all(search_restults).first
   end
 
   def initialize(params = {})

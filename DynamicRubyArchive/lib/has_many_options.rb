@@ -1,4 +1,5 @@
 require 'active_support/inflector'
+require_relative 'assoc_options'
 
 class HasManyOptions < AssocOptions
   def initialize(name, self_class_name, options = {})
@@ -8,7 +9,7 @@ class HasManyOptions < AssocOptions
       primary_key: :id
     }
     defaults.keys.each do |key|
-      self.send("#{key}"=, options[key] || defaults[key])
+      self.send("#{key}=", options[key] || defaults[key])
     end
   end
 end
