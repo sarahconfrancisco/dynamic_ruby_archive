@@ -1,4 +1,5 @@
 require 'active_support/inflector'
+
 class AssocOptions
   attr_accessor(
     :foreign_key,
@@ -7,7 +8,7 @@ class AssocOptions
   )
 
   def model_class
-    @class_name.constantize
+    @class_name.singularize.constantize
   end
 
   def table_name

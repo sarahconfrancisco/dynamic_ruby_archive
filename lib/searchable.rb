@@ -1,6 +1,6 @@
 require_relative 'db_connection'
-require_relative 'sql_object'
-require 'byebug'
+require_relative 'dra_object'
+
 module Searchable
   def where(params)
     where_line, vals = where_line_and_values(params)
@@ -17,6 +17,7 @@ module Searchable
   end
 
   def where_line_and_values(params)
+    p params
     where_line = []
     vals = []
     params.each do |k, v|
@@ -28,6 +29,6 @@ module Searchable
   end
 end
 
-class SQLObject
+class DRAObject
   extend Searchable
 end

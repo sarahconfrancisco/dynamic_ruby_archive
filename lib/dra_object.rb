@@ -1,8 +1,7 @@
 require_relative 'db_connection'
 require 'active_support/inflector'
-require 'byebug'
 
-class SQLObject
+class DRAObject
   def self.columns
     if @columns
       @columns
@@ -35,6 +34,14 @@ class SQLObject
   def self.table_name
     @table_name ||= self.to_s.tableize
 
+  end
+
+  def self.first
+    self.all.first
+  end
+
+  def self.last
+    self.all.last
   end
 
   def self.all

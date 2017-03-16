@@ -2,7 +2,6 @@ require_relative 'searchable'
 require_relative 'belongs_to_options'
 require_relative 'has_many_options'
 require 'active_support/inflector'
-require 'byebug'
 
 module Associatable
   def belongs_to(name, options = {})
@@ -20,6 +19,15 @@ module Associatable
       options = self.class.assoc_options[name]
       key_val = self.send(options.primary_key)
       options.model_class.where(options.foreign_key => key_val)
+    end
+  end
+
+  def has_one(name, options = {})
+    self.assoc_options[name] = HasManyOptions.new(name, self.name, options)
+    define_method(name) do
+      options = self.class.assoc_options[name]
+      key_val = self.send(options.primary_key)
+      options.model_class.where(options.foreign_key => key_val).first
     end
   end
 
@@ -75,6 +83,6 @@ module Associatable
   end
 end
 
-class SQLObject
+class DRAObject
   extend Associatable
 end
